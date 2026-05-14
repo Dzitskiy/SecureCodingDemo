@@ -5,6 +5,21 @@
 
 >Для быстрого старта открой `/demo`: там можно выбрать любой сценарий, выполнить готовый `unsafe` и `safe` запрос и сразу сравнить результат. Для raw API exploration используй `/swagger`.
 
+## Запуск локально
+
+```powershell
+dotnet restore SecureCodingDemo.slnx
+dotnet run --project src/SecureCodingDemo.csproj
+```
+
+## Запуск через Docker Compose
+
+```powershell
+docker compose up --build
+```
+
+Приложение будет доступно на `http://localhost:8080`, PostgreSQL на `localhost:5432`, Redis на `localhost:6379`.
+
 ## Базовые принципы Secure Coding
 
 - Не доверять никакому внешнему вводу: данные от клиента должны валидироваться, ограничиваться и кодироваться в нужном контексте.

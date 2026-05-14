@@ -17,9 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\docs\**\*.md" Link="docs\%(RecursiveDir)%(Filename)%(Extension)">
+    <Content Include="..\docs\**\*.md" Link="docs\%(RecursiveDir)%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="..\docs\sections\**" />
   </ItemGroup>
 </Project>
