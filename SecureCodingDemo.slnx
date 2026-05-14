@@ -1,0 +1,33 @@
+<Solution>
+  <File Path="README.md" />
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Solution Items/docs/">
+    <File Path="docs/sections/01-xss.md" />
+    <File Path="docs/sections/02-sanitization-vs-encoding.md" />
+    <File Path="docs/sections/03-whitelist-validation.md" />
+    <File Path="docs/sections/04-sql-injection.md" />
+    <File Path="docs/sections/05-dos-resource-exhaustion.md" />
+    <File Path="docs/sections/06-rate-limiting.md" />
+    <File Path="docs/sections/07-mass-assignment.md" />
+    <File Path="docs/sections/08-ssrf.md" />
+    <File Path="docs/sections/09-dangerous-file-upload.md" />
+    <File Path="docs/sections/10-path-traversal.md" />
+    <File Path="docs/sections/11-jwt-idor.md" />
+    <File Path="docs/sections/12-dangerous-logging.md" />
+    <File Path="docs/sections/13-dependency-security.md" />
+    <File Path="docs/sections/14-cancellation-token.md" />
+    <File Path="docs/sections/15-csp.md" />
+    <File Path="docs/sections/16-insecure-deserialization.md" />
+    <File Path="docs/sections/17-secrets-management.md" />
+    <File Path="docs/sections/18-cache-stampede.md" />
+    <File Path="docs/sections/19-regex-dos.md" />
+    <File Path="docs/sections/20-unsafe-reflection.md" />
+    <File Path="docs/sections/21-broken-access-control.md" />
+    <File Path="docs/sections/22-security-misconfiguration.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/SecureCodingDemo.csproj" />
+  </Folder>
+</Solution>
