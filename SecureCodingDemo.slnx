@@ -25,6 +25,13 @@
     <File Path="docs/21-broken-access-control.md" />
     <File Path="docs/22-security-misconfiguration.md" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".dockerignore" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="docker-compose.yml" />
+    <File Path="README.md" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/SecureCodingDemo.csproj" />
   </Folder>
