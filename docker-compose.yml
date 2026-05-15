@@ -13,11 +13,11 @@ services:
       Jwt__SigningKey: dev-only-demo-signing-key-change-me
     ports:
       - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_started
+    # depends_on:
+    #   postgres:
+    #     condition: service_healthy
+    #   redis:
+    #     condition: service_started
 
 #   postgres:
 #     image: postgres:16
