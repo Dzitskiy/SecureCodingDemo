@@ -1,13 +1,14 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using SecureCodingDemo.Infrastructure;
 using SecureCodingDemo.Modules;
 using SecureCodingDemo.Services;
 using Serilog;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +28,6 @@ builder.Host.UseSerilog();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
-builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
 builder.Services.AddHttpClient("ssrf-demo", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(5);
@@ -79,37 +79,22 @@ builder.Services.AddSingleton<ReflectionDemoService>();
 builder.Services.AddSingleton<CacheStampedeService>();
 builder.Services.AddSingleton<DemoRepository>();
 builder.Services.AddSingleton<DocumentationCatalog>();
+builder.Services.AddSingleton<DemoTopicCatalog>();
+builder.Services.AddSingleton<DemoPlaygroundCatalog>();
 builder.Services.AddSingleton<DemoScenarioCatalog>();
-
-builder.Services.AddSingleton<RedisConnectionAccessor>(_ =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("Redis");
-    if (string.IsNullOrWhiteSpace(connectionString))
-    {
-        return new RedisConnectionAccessor(null);
-    }
-
-    try
-    {
-        return new RedisConnectionAccessor(ConnectionMultiplexer.Connect(connectionString));
-    }
-    catch
-    {
-        return new RedisConnectionAccessor(null);
-    }
-});
 
 var app = builder.Build();
 
 DemoEnvironmentSetup.EnsureDemoAssets(app.Environment.ContentRootPath);
 
-using (var scope = app.Services.CreateScope())
-{
-    var repository = scope.ServiceProvider.GetRequiredService<DemoRepository>();
-    await repository.InitializeAsync(app.Lifetime.ApplicationStopping);
-}
-
 app.UseSerilogRequestLogging();
+app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(DocsPathResolver.ResolveDocsRoot(app.Environment)),
+    RequestPath = "/docs",
+    ContentTypeProvider = CreateDocsContentTypeProvider()
+});
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -121,7 +106,6 @@ app.MapGet("/", () => Results.Redirect("/demo"))
 .ExcludeFromDescription();
 
 app.MapCatalogEndpoints();
-app.MapDocumentationEndpoints();
 app.MapDemoPlaygroundEndpoints();
 app.MapInputSecurityEndpoints();
 app.MapDataSecurityEndpoints();
@@ -131,3 +115,10 @@ app.MapObservabilityEndpoints();
 app.MapConfigurationEndpoints();
 
 app.Run();
+
+static FileExtensionContentTypeProvider CreateDocsContentTypeProvider()
+{
+    var provider = new FileExtensionContentTypeProvider();
+    provider.Mappings[".md"] = "text/markdown; charset=utf-8";
+    return provider;
+}

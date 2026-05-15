@@ -1,0 +1,540 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Secure Coding Demo</title>
+  <style>
+    :root {
+      --bg: #f4efe5;
+      --panel: rgba(255, 255, 255, 0.9);
+      --line: rgba(31, 36, 48, 0.12);
+      --text: #202532;
+      --muted: #5b6675;
+      --unsafe: #b54833;
+      --safe: #22784f;
+      --accent: #0b596f;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(11, 89, 111, 0.18), transparent 30%),
+        linear-gradient(180deg, #f7f3eb 0%, #ece4d4 100%);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 12px 36px rgba(31, 36, 48, 0.08);
+    }
+
+    .hero {
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #0b596f, #167b74);
+      color: white;
+    }
+
+    .hero h1, .detail h2, .variant h3 {
+      margin: 0;
+      font-family: Georgia, serif;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .hero-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 999px;
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hero-link:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .sidebar-list {
+      max-height: calc(100vh - 180px);
+      overflow: auto;
+      padding: 12px;
+    }
+
+    .scenario-button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 12px 14px;
+      text-align: left;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .scenario-button:hover,
+    .scenario-button.active {
+      border-color: rgba(11, 89, 111, 0.22);
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    .scenario-title {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    .detail {
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: var(--accent);
+      background: rgba(11, 89, 111, 0.1);
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+
+    .variants {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .variant {
+      padding-top: 16px;
+    }
+
+    .variant.unsafe { border-top: 4px solid var(--unsafe); }
+    .variant.safe { border-top: 4px solid var(--safe); }
+
+    .tag {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      color: white;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .unsafe .tag { background: var(--unsafe); }
+    .safe .tag { background: var(--safe); }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid rgba(31, 36, 48, 0.12);
+      border-radius: 12px;
+      font: inherit;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+      font-family: Consolas, monospace;
+      font-size: 0.92rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 14px 0;
+    }
+
+    .actions button,
+    a.action-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: none;
+      text-decoration: none;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .unsafe button { background: var(--unsafe); color: white; }
+    .safe button { background: var(--safe); color: white; }
+    a.action-link { background: rgba(11, 89, 111, 0.1); color: var(--accent); }
+
+    .output {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #11212c;
+      color: #eaf5ff;
+    }
+
+    .output pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: Consolas, monospace;
+      font-size: 0.86rem;
+      max-height: 320px;
+      overflow: auto;
+    }
+
+    .output iframe {
+      width: 100%;
+      min-height: 220px;
+      margin-top: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 10px;
+      background: white;
+    }
+
+    .notes {
+      padding-left: 18px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1100px) {
+      .layout, .variants {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar-list {
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <section class="panel hero">
+        <h1>Secure Coding Demo</h1>
+        <p>Выбери кейс из документации, сравни уязвимый и безопасный варианты, выполни готовый запрос и посмотри разницу в ответе.</p>
+        <div class="hero-links">
+          <a class="hero-link" href="https://t.me/dzitskiy_dev" target="_blank" rel="noreferrer">Telegram-канал автора</a>
+          <a class="hero-link" href="https://github.com/Dzitskiy/SecureCodingDemo" target="_blank" rel="noreferrer">GitHub-репозиторий</a>
+        </div>
+      </section>
+      <section class="panel sidebar-list" id="scenario-list">
+        <div class="muted">Загружаю список сценариев...</div>
+      </section>
+    </aside>
+
+    <main>
+      <section class="panel detail" id="detail-panel">
+        <div class="muted">Открываю первый сценарий...</div>
+      </section>
+      <section class="variants" id="variants-panel"></section>
+    </main>
+  </div>
+
+  <script>
+    const state = { scenarios: [], selected: null };
+
+    async function fetchJson(url, options) {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(`${response.status} ${response.statusText}\n${body}`);
+      }
+      return response.json();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function buildUrl(path, query) {
+      return query ? `${path}?${query}` : path;
+    }
+
+    function formatCurl(spec) {
+      const url = buildUrl(spec.path, spec.query);
+      const parts = [`curl -i -X ${spec.method} "${url}"`];
+      if (spec.auth) parts.push('-H "Authorization: Bearer <demo-token>"');
+      if (spec.kind === "json") {
+        parts.push('-H "Content-Type: application/json"');
+        parts.push(`--data-raw '${spec.body ?? ""}'`);
+      } else if (spec.kind === "text") {
+        parts.push(`-H "Content-Type: ${spec.contentType || "text/plain"}"`);
+        parts.push(`--data-raw '${spec.body ?? ""}'`);
+      } else if (spec.kind === "multipart") {
+        parts.push(`-F "file=@${spec.fileName || "sample.txt"}"`);
+      }
+      return parts.join(" ");
+    }
+
+    async function getToken(auth) {
+      const result = await fetchJson(auth.tokenPath, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userName: auth.userName, password: auth.password })
+      });
+      return result.accessToken;
+    }
+
+    function renderList() {
+      const container = document.getElementById("scenario-list");
+      container.innerHTML = state.scenarios.map((scenario) => `
+        <button class="scenario-button ${state.selected?.slug === scenario.slug ? "active" : ""}" data-slug="${scenario.slug}">
+          <span class="scenario-title">${escapeHtml(scenario.title)}</span>
+          <div class="muted">${escapeHtml(scenario.category)}</div>
+          <div class="muted">${escapeHtml(scenario.summary)}</div>
+        </button>
+      `).join("");
+
+      for (const button of container.querySelectorAll("[data-slug]")) {
+        button.addEventListener("click", () => loadScenario(button.dataset.slug));
+      }
+    }
+
+    function renderDetail() {
+      const panel = document.getElementById("detail-panel");
+      if (!state.selected) {
+        panel.innerHTML = '<div class="muted">Сценарий не найден.</div>';
+        return;
+      }
+
+      panel.innerHTML = `
+        <div class="badge">${escapeHtml(state.selected.category)}</div>
+        <h2>${escapeHtml(state.selected.title)}</h2>
+        <p>${escapeHtml(state.selected.summary)}</p>
+        <p><strong>Документация:</strong> <a href="${state.selected.documentationUrl}" target="_blank" rel="noreferrer">Открыть Markdown-раздел</a></p>
+        <ul class="notes">
+          ${state.selected.notes?.length
+            ? state.selected.notes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")
+            : "<li>Сравни статус, тело ответа и заголовки между уязвимым и безопасным вариантом.</li>"}
+        </ul>
+      `;
+    }
+
+    function variantTemplate(kind, variant) {
+      const request = variant.request;
+      const hasBody = request.kind === "json" || request.kind === "text";
+      const hasQuery = request.kind === "query";
+      const isMultipart = request.kind === "multipart";
+      const canOpen = request.method === "GET" && !request.auth;
+
+      return `
+        <article class="panel variant ${kind}">
+          <span class="tag">${escapeHtml(variant.label)}</span>
+          <h3>${escapeHtml(variant.description)}</h3>
+          <div class="field">
+            <label>Endpoint</label>
+            <input type="text" id="${kind}-path" value="${escapeHtml(request.path)}">
+          </div>
+          <div class="field">
+            <label>Method</label>
+            <input type="text" id="${kind}-method" value="${escapeHtml(request.method)}">
+          </div>
+          ${hasQuery ? `
+          <div class="field">
+            <label>Query</label>
+            <input type="text" id="${kind}-query" value="${escapeHtml(request.query || "")}">
+          </div>` : ""}
+          ${hasBody ? `
+          <div class="field">
+            <label>Body</label>
+            <textarea id="${kind}-body">${escapeHtml(request.body || "")}</textarea>
+          </div>` : ""}
+          ${isMultipart ? `
+          <div class="field">
+            <label>Имя файла</label>
+            <input type="text" id="${kind}-file-name" value="${escapeHtml(request.fileName || "sample.txt")}">
+          </div>
+          <div class="field">
+            <label>Содержимое файла</label>
+            <textarea id="${kind}-file-content">${escapeHtml(request.fileContent || "")}</textarea>
+          </div>
+          <div class="field">
+            <label>Или выбрать реальный файл</label>
+            <input type="file" id="${kind}-file-upload">
+          </div>` : ""}
+          <div class="field">
+            <label>Sample curl</label>
+            <textarea readonly>${escapeHtml(formatCurl(request))}</textarea>
+          </div>
+          <div class="actions">
+            <button data-run="${kind}">Run ${escapeHtml(variant.label)}</button>
+            ${canOpen ? `<a class="action-link" href="${buildUrl(request.path, request.query)}" target="_blank" rel="noreferrer">Открыть маршрут</a>` : ""}
+          </div>
+          ${request.auth ? `<p class="muted">Токен будет получен автоматически для ${escapeHtml(request.auth.userName)}.</p>` : ""}
+          <ul class="notes">${variant.checkpoints.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+          <div class="output" id="${kind}-output"><pre>Запрос еще не выполнялся.</pre></div>
+        </article>
+      `;
+    }
+
+    function renderVariants() {
+      const panel = document.getElementById("variants-panel");
+      if (!state.selected) {
+        panel.innerHTML = "";
+        return;
+      }
+
+      panel.innerHTML = [
+        variantTemplate("unsafe", state.selected.unsafe),
+        variantTemplate("safe", state.selected.safe)
+      ].join("");
+
+      for (const button of panel.querySelectorAll("[data-run]")) {
+        button.addEventListener("click", () => runVariant(button.dataset.run));
+      }
+    }
+
+    function cloneRequest(request) {
+      return JSON.parse(JSON.stringify(request));
+    }
+
+    function readVariant(kind) {
+      const request = cloneRequest(state.selected[kind].request);
+      request.path = document.getElementById(`${kind}-path`).value.trim();
+      request.method = document.getElementById(`${kind}-method`).value.trim().toUpperCase();
+      if (request.kind === "query") request.query = document.getElementById(`${kind}-query`).value.trim();
+      if (request.kind === "json" || request.kind === "text") request.body = document.getElementById(`${kind}-body`).value;
+      if (request.kind === "multipart") {
+        request.fileName = document.getElementById(`${kind}-file-name`).value.trim();
+        request.fileContent = document.getElementById(`${kind}-file-content`).value;
+      }
+      return request;
+    }
+
+    async function runVariant(kind) {
+      const output = document.getElementById(`${kind}-output`);
+      output.innerHTML = "<pre>Выполняю запрос...</pre>";
+
+      try {
+        const request = readVariant(kind);
+        const headers = {};
+        if (request.auth) {
+          headers.Authorization = `Bearer ${await getToken(request.auth)}`;
+        }
+
+        const options = { method: request.method, headers };
+        if (request.kind === "json") {
+          headers["Content-Type"] = request.contentType || "application/json";
+          options.body = request.body || "{}";
+        } else if (request.kind === "text") {
+          headers["Content-Type"] = request.contentType || "text/plain";
+          options.body = request.body || "";
+        } else if (request.kind === "multipart") {
+          const form = new FormData();
+          const fileInput = document.getElementById(`${kind}-file-upload`);
+          if (fileInput.files?.length > 0) {
+            form.append("file", fileInput.files[0], fileInput.files[0].name);
+          } else {
+            form.append("file", new Blob([request.fileContent || "demo file"], { type: "text/plain" }), request.fileName || "sample.txt");
+          }
+          options.body = form;
+        }
+
+        const response = await fetch(buildUrl(request.path, request.query), options);
+        const contentType = response.headers.get("content-type") || "";
+        const rawBody = await response.text();
+        const headersText = Array.from(response.headers.entries())
+          .map(([name, value]) => `${name}: ${value}`)
+          .join("\n");
+
+        let prettyBody = rawBody;
+        if (contentType.includes("application/json")) {
+          try { prettyBody = JSON.stringify(JSON.parse(rawBody), null, 2); } catch { }
+        }
+
+        const htmlPreview = contentType.includes("text/html")
+          ? `<iframe sandbox="allow-scripts allow-same-origin" srcdoc="${escapeHtml(rawBody)}"></iframe>`
+          : "";
+
+        output.innerHTML = `
+          <pre>Status: ${response.status} ${response.statusText}
+
+Headers:
+${escapeHtml(headersText || "(нет интересных заголовков)")}
+
+Body:
+${escapeHtml(prettyBody || "(пустой ответ)")}</pre>
+          ${htmlPreview}
+        `;
+      } catch (error) {
+        output.innerHTML = `<pre>${escapeHtml(error.message || String(error))}</pre>`;
+      }
+    }
+
+    async function loadScenario(slug) {
+      state.selected = await fetchJson(`/api/demos/${slug}`);
+      renderList();
+      renderDetail();
+      renderVariants();
+      history.replaceState({}, "", `#${slug}`);
+    }
+
+    async function bootstrap() {
+      try {
+        state.scenarios = await fetchJson("/api/demos");
+        renderList();
+        await loadScenario(window.location.hash.replace("#", "") || state.scenarios[0]?.slug);
+      } catch (error) {
+        document.getElementById("detail-panel").innerHTML = `<div class="muted">${escapeHtml(error.message || String(error))}</div>`;
+      }
+    }
+
+    bootstrap();
+  </script>
+</body>
+</html>

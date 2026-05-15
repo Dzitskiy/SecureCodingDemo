@@ -1,0 +1,1 @@
+This file is intentionally public for the path traversal demo.

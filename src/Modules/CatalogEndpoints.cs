@@ -6,14 +6,8 @@ public static class CatalogEndpoints
 {
     public static IEndpointRouteBuilder MapCatalogEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/sections", (DocumentationCatalog catalog) =>
-            catalog.GetSections().Select(section => new
-            {
-                section.Slug,
-                section.Title,
-                section.UnsafeEndpoint,
-                section.SafeEndpoint
-            }))
+        app.MapGet("/api/sections", (DemoScenarioCatalog catalog) =>
+            Results.Ok(catalog.GetScenarios()))
             .WithTags("00. Catalog")
             .WithSummary("Catalog of secure coding demo sections");
 

@@ -1,6 +1,30 @@
 <Solution>
   <File Path="docker-compose.yml" />
   <File Path="README.md" />
+  <Folder Name="/docs/">
+    <File Path="docs/01-xss.md" />
+    <File Path="docs/02-sanitization-vs-encoding.md" />
+    <File Path="docs/03-whitelist-validation.md" />
+    <File Path="docs/04-sql-injection.md" />
+    <File Path="docs/05-dos-resource-exhaustion.md" />
+    <File Path="docs/06-rate-limiting.md" />
+    <File Path="docs/07-mass-assignment.md" />
+    <File Path="docs/08-ssrf.md" />
+    <File Path="docs/09-dangerous-file-upload.md" />
+    <File Path="docs/10-path-traversal.md" />
+    <File Path="docs/11-jwt-idor.md" />
+    <File Path="docs/12-dangerous-logging.md" />
+    <File Path="docs/13-dependency-security.md" />
+    <File Path="docs/14-cancellation-token.md" />
+    <File Path="docs/15-csp.md" />
+    <File Path="docs/16-insecure-deserialization.md" />
+    <File Path="docs/17-secrets-management.md" />
+    <File Path="docs/18-cache-stampede.md" />
+    <File Path="docs/19-regex-dos.md" />
+    <File Path="docs/20-unsafe-reflection.md" />
+    <File Path="docs/21-broken-access-control.md" />
+    <File Path="docs/22-security-misconfiguration.md" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/SecureCodingDemo.csproj" />
   </Folder>

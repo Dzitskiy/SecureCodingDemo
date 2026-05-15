@@ -18,11 +18,6 @@ public sealed class DemoRepository
         new(103, 2, "Bob payroll export", 900m)
     ];
 
-    public Task InitializeAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
     public UnsafeLoginResult UnsafeLogin(string userName, string password)
     {
         var sql = $"select * from users where username = '{userName}' and password = '{password}'";
